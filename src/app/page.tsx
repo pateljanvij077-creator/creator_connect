@@ -115,11 +115,11 @@ export default function Home() {
             <span className="inline-flex mx-auto items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary animate-pulse">
               <Zap className="h-3.5 w-3.5 fill-primary" /> Connect. Collaborate. Grow.
             </span>
-            <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl font-sans leading-tight">
-              Grow Your Local Business With <br />
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl font-sans leading-tight">
+              Grow Your Local Business With{' '}
               <span className="gradient-text">Local Content Creators</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
               Find top Instagram, YouTube, and TikTok creators in your neighborhood. Book campaigns, check analytics, and manage commission overrides in one simple panel.
             </p>
 
@@ -158,12 +158,12 @@ export default function Home() {
               </button>
             </form>
 
-            {/* Micro stats */}
-            <div className="flex items-center justify-center gap-8 text-xs text-muted-foreground mt-4 font-medium uppercase tracking-wider">
+            {/* Micro stats — wraps gracefully on small phones */}
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground mt-4 font-medium uppercase tracking-wider">
               <span>⚡ {totalCreators} Active Creators</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>🔥 {totalCollabs}+ Completed Campaigns</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>🛡️ Verified Local Businesses</span>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {CATEGORIES.map((cat) => (
               <Link 
                 key={cat.id} 

@@ -161,7 +161,7 @@ export default function BusinessDashboard() {
       </div>
 
       {/* Grid Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
         {/* Total Spent */}
         <div className="glass-panel rounded-2xl border border-border p-5 col-span-2 flex flex-col justify-between shadow-sm">
           <div className="flex justify-between items-start">
@@ -301,35 +301,54 @@ export default function BusinessDashboard() {
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-border text-muted-foreground font-bold">
-                    <th className="py-2.5">Creator</th>
-                    <th className="py-2.5">Campaign Name</th>
-                    <th className="py-2.5">Date</th>
-                    <th className="py-2.5">Cost</th>
-                    <th className="py-2.5 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {bookings.slice(0, 5).map((booking) => (
-                    <tr key={booking.id} className="hover:bg-secondary/20 transition-colors">
-                      <td className="py-3 font-semibold text-foreground">{booking.creatorName}</td>
-                      <td className="py-3 text-muted-foreground truncate max-w-[150px]">{booking.campaignTitle}</td>
-                      <td className="py-3 text-muted-foreground">{booking.campaignDate}</td>
-                      <td className="py-3 font-bold text-foreground">
-                        {formatCurrency(booking.businessPayment)}
-                      </td>
-                      <td className="py-3 text-right">
-                        <span className={getStatusBadgeClass(booking.status)}>
-                          {booking.status}
-                        </span>
-                      </td>
+            <div>
+              {/* Mobile: card list */}
+              <div className="flex flex-col gap-3 md:hidden">
+                {bookings.slice(0, 5).map((booking) => (
+                  <div key={booking.id} className="rounded-xl border border-border bg-background/50 p-3 flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-foreground">{booking.creatorName}</span>
+                      <span className={getStatusBadgeClass(booking.status)}>{booking.status}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground truncate">{booking.campaignTitle}</p>
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span>{booking.campaignDate}</span>
+                      <span className="font-bold text-foreground">{formatCurrency(booking.businessPayment)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop: table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-muted-foreground font-bold">
+                      <th className="py-2.5">Creator</th>
+                      <th className="py-2.5">Campaign Name</th>
+                      <th className="py-2.5">Date</th>
+                      <th className="py-2.5">Cost</th>
+                      <th className="py-2.5 text-right">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {bookings.slice(0, 5).map((booking) => (
+                      <tr key={booking.id} className="hover:bg-secondary/20 transition-colors">
+                        <td className="py-3 font-semibold text-foreground">{booking.creatorName}</td>
+                        <td className="py-3 text-muted-foreground truncate max-w-[150px]">{booking.campaignTitle}</td>
+                        <td className="py-3 text-muted-foreground">{booking.campaignDate}</td>
+                        <td className="py-3 font-bold text-foreground">
+                          {formatCurrency(booking.businessPayment)}
+                        </td>
+                        <td className="py-3 text-right">
+                          <span className={getStatusBadgeClass(booking.status)}>
+                            {booking.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

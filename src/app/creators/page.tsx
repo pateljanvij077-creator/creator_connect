@@ -44,6 +44,7 @@ function SearchResultsContent() {
   const [minRating, setMinRating] = useState<number>(0);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortBy, setSortBy] = useState('highest-rated');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Load creators
   useEffect(() => {
@@ -184,14 +185,15 @@ function SearchResultsContent() {
     setMinRating(0);
     setVerifiedOnly(false);
     setSortBy('highest-rated');
+    setShowMobileFilters(false);
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 flex-grow flex flex-col">
+    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex-grow flex flex-col">
       {/* Top Search bar */}
       <form 
         onSubmit={handleSearchSubmit} 
-        className="glass-panel w-full rounded-2xl p-4 mb-8 flex flex-col sm:flex-row gap-3 border border-border shadow-sm items-center"
+        className="glass-panel w-full rounded-2xl p-3 mb-6 flex flex-col sm:flex-row gap-3 border border-border shadow-sm items-center"
       >
         <div className="flex-grow w-full flex items-center gap-2 px-3 bg-background rounded-xl border border-border/80">
           <Search className="h-4.5 w-4.5 text-muted-foreground flex-shrink-0" />
@@ -215,30 +217,41 @@ function SearchResultsContent() {
           />
         </div>
 
-        <select 
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="w-full sm:w-48 rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
-        >
-          <option value="highest-rated">Sort by: Highest Rated</option>
-          <option value="lowest-price">Sort by: Lowest Price</option>
-          <option value="highest-followers">Sort by: Followers Count</option>
-          <option value="newest">Sort by: Newest</option>
-        </select>
+        <div className="w-full sm:w-auto flex gap-2">
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="flex-1 sm:w-48 rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+          >
+            <option value="highest-rated">Sort by: Highest Rated</option>
+            <option value="lowest-price">Sort by: Lowest Price</option>
+            <option value="highest-followers">Sort by: Followers Count</option>
+            <option value="newest">Sort by: Newest</option>
+          </select>
 
-        <button
-          type="submit"
-          className="w-full sm:w-auto rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 shadow-sm"
-        >
-          <Search className="h-4 w-4" /> Search
-        </button>
+          {/* Mobile filters toggle */}
+          <button
+            type="button"
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="lg:hidden rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-bold text-foreground flex items-center gap-1.5"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+          </button>
+
+          <button
+            type="submit"
+            className="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 shadow-sm"
+          >
+            <Search className="h-4 w-4" /> Search
+          </button>
+        </div>
       </form>
 
       {/* Main Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 flex-grow">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 flex-grow">
         
-        {/* Filter Sidebar */}
-        <aside className="lg:col-span-1 flex flex-col gap-5">
+        {/* Filter Sidebar — hidden on mobile unless toggled */}
+        <aside className={`lg:col-span-1 flex flex-col gap-5 ${showMobileFilters ? 'block' : 'hidden lg:flex'}`}>
           <div className="glass-panel rounded-2xl border border-border p-5 sticky top-24">
             <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-4">
               <span className="flex items-center gap-1.5 text-sm font-bold text-foreground">
