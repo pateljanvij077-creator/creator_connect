@@ -170,7 +170,149 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. CATEGORIES SECTION */}
+      {/* 2. PROBLEM & SOLUTION SECTION */}
+      <section className="py-20 relative overflow-hidden">
+        {/* Subtle background blobs */}
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          <div className="absolute -left-24 top-1/4 w-72 h-72 rounded-full bg-rose-500/10 blur-3xl" />
+          <div className="absolute -right-24 bottom-1/4 w-72 h-72 rounded-full bg-primary/10 blur-3xl" />
+        </div>
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Section header */}
+          <div className="text-center mb-14">
+            <span className="inline-flex items-center gap-2 rounded-full bg-rose-500/10 px-4 py-1.5 text-xs font-bold text-rose-400 uppercase tracking-wider mb-4">
+              Why CreatorConnect?
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground leading-tight">
+              Local businesses face a <span className="text-rose-400">real gap</span>.
+              <br />
+              We built the{' '}
+              <span className="gradient-text">bridge.</span>
+            </h2>
+            <p className="mt-4 text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Traditional advertising is expensive, slow, and untargeted. Meanwhile, local content creators
+              struggle to monetise their hyper-local audience. CreatorConnect fixes both sides.
+            </p>
+          </div>
+
+          {/* Two-column: Problems | Solutions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+            {/* PROBLEMS COLUMN */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="h-5 w-5 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-400 text-xs font-bold">✕</span>
+                <h3 className="text-sm font-bold text-rose-400 uppercase tracking-wider">The Problems</h3>
+              </div>
+
+              {[
+                {
+                  emoji: '💸',
+                  title: 'Expensive Traditional Ads',
+                  desc: 'Print, radio, and Google Ads cost thousands yet rarely convert local foot traffic. Small businesses burn budgets with no guarantee of ROI.'
+                },
+                {
+                  emoji: '🔍',
+                  title: 'No Easy Way to Find Local Creators',
+                  desc: 'Searching Instagram manually for city-based creators is time-consuming, unverified, and unreliable. There\'s no directory, no pricing, no trust layer.'
+                },
+                {
+                  emoji: '🤝',
+                  title: 'Collaboration is Messy',
+                  desc: 'DMs go unanswered. Pricing is unclear. Contracts don\'t exist. Local businesses and creators can\'t find a professional workflow to work together.'
+                },
+                {
+                  emoji: '🧾',
+                  title: 'Zero Financial Transparency',
+                  desc: 'Hidden commissions, surprise GST, and unclear earnings make both businesses and creators hesitant. There\'s no calculator, no breakdown, no trust.'
+                }
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex gap-4 p-5 rounded-2xl bg-rose-500/5 border border-rose-500/20 hover:border-rose-500/40 transition-colors"
+                >
+                  <span className="text-2xl flex-shrink-0 mt-0.5">{item.emoji}</span>
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground mb-1">{item.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* SOLUTIONS COLUMN */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">✓</span>
+                <h3 className="text-sm font-bold text-primary uppercase tracking-wider">Our Solution</h3>
+              </div>
+
+              {[
+                {
+                  emoji: '📍',
+                  title: 'Hyper-Local Creator Discovery',
+                  desc: 'Search verified creators by city, niche, follower count, and starting price — all in one place. No cold DMs, no guessing games.'
+                },
+                {
+                  emoji: '📦',
+                  title: 'One-Click Campaign Booking',
+                  desc: 'Select a package, describe deliverables, and submit. The platform auto-calculates your budget, GST, and creator payout — completely transparently.'
+                },
+                {
+                  emoji: '⚡',
+                  title: 'Instant Direct Connection',
+                  desc: 'No slow in-app chat. Direct buttons open the creator\'s Instagram, WhatsApp, or phone — so you negotiate and confirm in minutes, not days.'
+                },
+                {
+                  emoji: '🛡️',
+                  title: 'Verified Creators & Trust Layer',
+                  desc: 'Every creator is manually reviewed by admins. Verified badges, engagement audits, and completed-collab history give you confidence before you pay.'
+                }
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex gap-4 p-5 rounded-2xl bg-primary/5 border border-primary/20 hover:border-primary/50 transition-colors"
+                >
+                  <span className="text-2xl flex-shrink-0 mt-0.5">{item.emoji}</span>
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground mb-1">{item.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom CTA strip */}
+          <div className="mt-14 rounded-2xl gradient-primary p-px shadow-xl shadow-primary/20">
+            <div className="rounded-2xl bg-card/90 p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div>
+                <h3 className="text-lg font-extrabold text-foreground">Ready to bridge the gap?</h3>
+                <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                  Join hundreds of local businesses already using CreatorConnect to reach real customers through authentic local content.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                <Link
+                  href="/signup?role=business"
+                  className="rounded-xl gradient-primary px-6 py-3 text-sm font-bold text-white shadow-md hover:opacity-90 transition-all flex items-center gap-2"
+                >
+                  Get Started Free <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/creators"
+                  className="rounded-xl border border-border px-6 py-3 text-sm font-bold text-foreground hover:bg-secondary/50 transition-all text-center"
+                >
+                  Browse Creators
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. CATEGORIES SECTION */}
       <section className="py-16 bg-card/20 border-y border-border/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
