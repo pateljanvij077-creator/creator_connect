@@ -72,18 +72,18 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md transition-colors">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 dark:bg-slate-800/90 backdrop-blur-md transition-colors">
+      <div className="w-full px-4 sm:px-6 lg:px-10">
+        <div className="flex h-16 md:h-20 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-1.5 text-2xl font-bold tracking-tight">
-              <span className="gradient-primary flex h-8 w-8 items-center justify-center rounded-lg text-white font-mono shadow-md">
-                C
-              </span>
-              <span className="font-sans font-extrabold text-foreground">
-                Creator<span className="text-primary">Connect</span>
-              </span>
+          <div className="flex items-center w-40 md:w-56 h-16 md:h-20 isolate">
+            <Link href="/" className="flex items-center justify-center dark:bg-white/90 dark:px-2 dark:py-0.5 dark:rounded-2xl hover:opacity-90 transition-opacity">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/logo.png" 
+                alt="CreatorConnect Logo" 
+                className="h-16 md:h-20 w-auto object-contain mix-blend-multiply" 
+              />
             </Link>
           </div>
 

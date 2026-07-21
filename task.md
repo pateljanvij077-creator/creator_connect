@@ -1,4 +1,4 @@
-# CreatorConnect Development Tasks
+![![alt text](image-1.png)](image.png)# CreatorConnect Development Tasks
 
 - [x] Scaffolding and Dependencies
   - [x] Initialize Next.js 15 with Tailwind, TypeScript, and App Router

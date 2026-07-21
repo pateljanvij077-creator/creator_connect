@@ -52,14 +52,14 @@ export default function CreatorCard({ creator, localCity }: CreatorCardProps) {
   };
 
   return (
-    <div className="glass-card flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
+    <div className="glass-card flex flex-col overflow-hidden rounded-2xl border border-border bg-card group">
       {/* Cover and Photo Header */}
       <div className="relative h-32 w-full bg-muted">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img 
           src={creator.coverImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600'} 
           alt={`${creator.name} cover`} 
-          className="h-full w-full object-cover opacity-80 dark:opacity-60"
+          className="h-full w-full object-cover opacity-80 dark:opacity-60 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-100"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent"></div>
         
@@ -69,7 +69,7 @@ export default function CreatorCard({ creator, localCity }: CreatorCardProps) {
           <img 
             src={creator.photo || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'} 
             alt={creator.name} 
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         </div>
       </div>
@@ -191,7 +191,7 @@ export default function CreatorCard({ creator, localCity }: CreatorCardProps) {
           )}
           <Link 
             href={`/creator/${creator.uid}`} 
-            className="flex h-9 items-center justify-center rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-sm shadow-primary/10 hover:opacity-90 transition-opacity"
+            className="flex h-9 items-center justify-center rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-sm shadow-primary/10 hover:opacity-90 hover:scale-105 active:scale-95 transition-all"
           >
             View Profile
           </Link>

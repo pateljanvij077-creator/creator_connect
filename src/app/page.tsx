@@ -107,7 +107,7 @@ export default function Home() {
       {/* 1. HERO SECTION */}
       <section className="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-24">
         <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-          <div className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72rem]"></div>
+          <div className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-500 to-purple-500 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72rem] animate-float-slow"></div>
         </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -152,7 +152,7 @@ export default function Home() {
 
               <button 
                 type="submit"
-                className="rounded-xl gradient-primary px-6 py-3 text-sm font-bold text-white shadow-md shadow-primary/20 hover:opacity-95 transition-all flex items-center justify-center gap-2 flex-shrink-0"
+                className="rounded-xl gradient-primary px-6 py-3 text-sm font-bold text-white shadow-md shadow-primary/20 hover:opacity-95 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 flex-shrink-0"
               >
                 Find Creators <ArrowRight className="h-4 w-4" />
               </button>
@@ -174,8 +174,8 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         {/* Subtle background blobs */}
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <div className="absolute -left-24 top-1/4 w-72 h-72 rounded-full bg-rose-500/10 blur-3xl" />
-          <div className="absolute -right-24 bottom-1/4 w-72 h-72 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -left-24 top-1/4 w-72 h-72 rounded-full bg-rose-500/10 blur-3xl animate-float" />
+          <div className="absolute -right-24 bottom-1/4 w-72 h-72 rounded-full bg-primary/10 blur-3xl animate-float-slow" />
         </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -329,7 +329,7 @@ export default function Home() {
               <Link 
                 key={cat.id} 
                 href={`/creators?category=${cat.slug}`}
-                className="group flex flex-col items-center justify-center p-4 rounded-2xl bg-card border border-border/80 text-center hover:border-primary hover:shadow-md transition-all cursor-pointer"
+                className="group flex flex-col items-center justify-center p-4 rounded-2xl bg-card border border-border/80 text-center hover:border-primary hover:shadow-md transition-all cursor-pointer hover-3d-tilt transform-3d"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-3 group-hover:bg-primary/20 transition-colors">
                   {getCategoryIcon(cat.iconName)}
@@ -416,7 +416,7 @@ export default function Home() {
                 desc: 'Creator posts deliverables, you confirm, and release payout. Leave feedback to build trust.'
               }
             ].map((item, idx) => (
-              <div key={idx} className="relative bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col justify-between">
+              <div key={idx} className="relative bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col justify-between hover-3d-lift">
                 <div>
                   <span className="text-3xl font-extrabold gradient-text block mb-4">
                     {item.step}

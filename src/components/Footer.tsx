@@ -10,13 +10,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Info */}
           <div className="flex flex-col gap-3">
-            <Link href="/" className="flex items-center gap-1.5 text-xl font-bold tracking-tight">
-              <span className="gradient-primary flex h-7 w-7 items-center justify-center rounded-lg text-white font-mono shadow-md text-sm">
-                C
-              </span>
-              <span className="font-sans font-extrabold text-foreground">
-                Creator<span className="text-primary">Connect</span>
-              </span>
+            <Link href="/" className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="CreatorConnect Logo" className="h-8 w-auto object-contain" />
             </Link>
             <p className="text-muted-foreground text-xs leading-relaxed max-w-xs">
               The premier marketplace connecting local restaurants, boutiques, and services with community content creators for high-engagement social media collaborations.
