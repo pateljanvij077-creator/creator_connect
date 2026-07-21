@@ -83,17 +83,18 @@ export default function BookingModal({ creator, isOpen, onClose, onSuccess }: Bo
 
     try {
       const businessProfile = profile as Business;
+      const creatorId = creator.uid || (creator as any).id || '';
       
       const newBooking: Omit<Booking, 'id' | 'createdAt'> = {
         businessId: user.uid,
-        businessName: businessProfile?.name || user.email,
-        creatorId: creator.uid,
-        creatorName: creator.name,
-        campaignTitle,
-        campaignDescription,
-        campaignDate,
-        location: location || businessProfile?.address || '',
-        expectedDeliverables,
+        businessName: businessProfile?.name || user.email || 'Business Owner',
+        creatorId: creatorId,
+        creatorName: creator.name || 'Creator',
+        campaignTitle: campaignTitle || '',
+        campaignDescription: campaignDescription || '',
+        campaignDate: campaignDate || '',
+        location: location || businessProfile?.address || 'Location TBD',
+        expectedDeliverables: expectedDeliverables || '',
         budget: parsedBudget,
         commissionPercent,
         commissionAmount,
@@ -106,19 +107,21 @@ export default function BookingModal({ creator, isOpen, onClose, onSuccess }: Bo
 
       const booking = await db.createBooking(newBooking);
 
-      // Trigger notification for Creator
-      await db.createNotification(
-        creator.uid,
-        'New Campaign Request!',
-        `${businessProfile?.name || 'A business'} has requested a campaign booking for "${campaignTitle}" on ${campaignDate}. Check request details to accept.`,
-        'booking_received'
-      );
+      // Trigger notification for Creator if creatorId exists
+      if (creatorId) {
+        await db.createNotification(
+          creatorId,
+          'New Campaign Request!',
+          `${businessProfile?.name || 'A business'} has requested a campaign booking for "${campaignTitle}" on ${campaignDate}. Check request details to accept.`,
+          'booking_received'
+        );
+      }
 
       // Trigger notification for Admin
       await db.createNotification(
         'admin_default',
         'New Booking Logged',
-        `Booking ${booking.id} between ${businessProfile?.name} and ${creator.name} created. Commission rate set to ${commissionPercent}%.`,
+        `Booking ${booking.id} between ${businessProfile?.name || user.email} and ${creator.name} created. Commission rate set to ${commissionPercent}%.`,
         'booking_received'
       );
 
@@ -143,6 +146,7 @@ export default function BookingModal({ creator, isOpen, onClose, onSuccess }: Bo
 
     } catch (err) {
       console.error('Error submitting booking:', err);
+      alert('Failed to send booking request. Please check your network or try again.');
     } finally {
       setLoading(false);
     }

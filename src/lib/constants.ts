@@ -11,6 +11,7 @@ export interface SocialLinks {
   dribbble?: string;
   behance?: string;
   linktree?: string;
+  whatsapp?: string;
   email?: string;
   website?: string;
 }

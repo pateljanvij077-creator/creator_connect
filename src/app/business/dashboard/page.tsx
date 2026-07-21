@@ -43,8 +43,7 @@ export default function BusinessDashboard() {
     const loadBusinessStats = async () => {
       setLoading(true);
       try {
-        const allBookings = await db.getBookings();
-        const businessBookings = allBookings.filter(b => b.businessId === user.uid);
+        const businessBookings = await db.getBookings(user.uid, 'business');
         setBookings(businessBookings);
 
         let spent = 0;

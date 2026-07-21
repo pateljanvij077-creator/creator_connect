@@ -47,12 +47,8 @@ service cloud.firestore {
     
     // 4. bookings
     match /bookings/{bookingId} {
-      allow read: if isAuthenticated() && (
-        request.auth.uid == resource.data.businessId || 
-        request.auth.uid == resource.data.creatorId || 
-        isAdmin()
-      );
-      allow create: if isAuthenticated() && getRole() == 'business';
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow update: if isAuthenticated() && (
         request.auth.uid == resource.data.businessId || 
         request.auth.uid == resource.data.creatorId || 

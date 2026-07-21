@@ -146,8 +146,9 @@ export const db = {
       const q = query(collection(firestoreDb, 'creators'));
       const querySnapshot = await getDocs(q);
       const list: Creator[] = [];
-      querySnapshot.forEach((doc) => {
-        list.push(doc.data() as Creator);
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({ ...data, uid: data.uid || docSnap.id } as Creator);
       });
       return list;
     } else {
@@ -159,7 +160,9 @@ export const db = {
     if (firestoreDb) {
       const docRef = doc(firestoreDb, 'creators', uid);
       const docSnap = await getDoc(docRef);
-      return docSnap.exists() ? (docSnap.data() as Creator) : null;
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return { ...data, uid: data.uid || docSnap.id } as Creator;
     } else {
       const list = getLocalStorageData('cc_creators', SEED_CREATORS);
       const item = list.find((c: Creator) => c.uid === uid);
@@ -213,8 +216,9 @@ export const db = {
       const q = query(collection(firestoreDb, 'businesses'));
       const querySnapshot = await getDocs(q);
       const list: Business[] = [];
-      querySnapshot.forEach((doc) => {
-        list.push(doc.data() as Business);
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({ ...data, uid: data.uid || docSnap.id } as Business);
       });
       return list;
     } else {
@@ -226,7 +230,9 @@ export const db = {
     if (firestoreDb) {
       const docRef = doc(firestoreDb, 'businesses', uid);
       const docSnap = await getDoc(docRef);
-      return docSnap.exists() ? (docSnap.data() as Business) : null;
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return { ...data, uid: data.uid || docSnap.id } as Business;
     } else {
       const list = getLocalStorageData('cc_businesses', SEED_BUSINESSES);
       const item = list.find((b: Business) => b.uid === uid);
@@ -271,17 +277,32 @@ export const db = {
   },
 
   // BOOKINGS
-  async getBookings(): Promise<Booking[]> {
+  async getBookings(userId?: string, role?: 'business' | 'creator' | 'admin'): Promise<Booking[]> {
     if (firestoreDb) {
-      const q = query(collection(firestoreDb, 'bookings'));
+      let q;
+      if (userId && role === 'business') {
+        q = query(collection(firestoreDb, 'bookings'), where('businessId', '==', userId));
+      } else if (userId && role === 'creator') {
+        q = query(collection(firestoreDb, 'bookings'), where('creatorId', '==', userId));
+      } else {
+        q = query(collection(firestoreDb, 'bookings'));
+      }
+
       const querySnapshot = await getDocs(q);
       const list: Booking[] = [];
-      querySnapshot.forEach((doc) => {
-        list.push(doc.data() as Booking);
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({ ...data, id: data.id || docSnap.id } as Booking);
       });
       return list;
     } else {
-      return getLocalStorageData('cc_bookings', SEED_BOOKINGS);
+      const list = getLocalStorageData('cc_bookings', SEED_BOOKINGS);
+      if (userId && role === 'business') {
+        return list.filter((b: Booking) => b.businessId === userId);
+      } else if (userId && role === 'creator') {
+        return list.filter((b: Booking) => b.creatorId === userId);
+      }
+      return list;
     }
   },
 
@@ -289,7 +310,9 @@ export const db = {
     if (firestoreDb) {
       const docRef = doc(firestoreDb, 'bookings', id);
       const docSnap = await getDoc(docRef);
-      return docSnap.exists() ? (docSnap.data() as Booking) : null;
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return { ...data, id: data.id || docSnap.id } as Booking;
     } else {
       const list = getLocalStorageData('cc_bookings', SEED_BOOKINGS);
       const item = list.find((b: Booking) => b.id === id);

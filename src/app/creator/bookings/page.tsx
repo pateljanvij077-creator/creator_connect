@@ -32,8 +32,7 @@ export default function CreatorBookings() {
     if (!user) return;
     setLoading(true);
     try {
-      const all = await db.getBookings();
-      const list = all.filter(b => b.creatorId === user.uid);
+      const list = await db.getBookings(user.uid, 'creator');
       setBookings(list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
     } catch (e) {
       console.error('Error fetching bookings:', e);

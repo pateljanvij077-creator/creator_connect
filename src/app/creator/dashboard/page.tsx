@@ -39,8 +39,7 @@ export default function CreatorDashboard() {
     if (!user) return;
     setLoading(true);
     try {
-      const allBookings = await db.getBookings();
-      const creatorBookings = allBookings.filter(b => b.creatorId === user.uid);
+      const creatorBookings = await db.getBookings(user.uid, 'creator');
       setBookings(creatorBookings);
 
       let earnings = 0;

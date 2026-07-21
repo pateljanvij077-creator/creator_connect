@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react';
-import { Creator, Review } from '@/lib/constants';
+import { Creator, Review, Booking } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { useAuth } from '@/lib/auth';
 import BookingModal from '@/components/BookingModal';
@@ -20,7 +20,9 @@ import {
   Users, 
   Play,
   ArrowLeft,
-  Camera
+  Camera,
+  Lock,
+  Clock
 } from 'lucide-react';
 import { 
   InstagramIcon, 
@@ -44,6 +46,7 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [bookings, setBookings] = useState<Booking[]>([]);
 
   // Load creator and reviews
   useEffect(() => {
@@ -63,6 +66,20 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
     };
     loadProfileData();
   }, [id]);
+
+  const loadUserBookings = async () => {
+    if (!user) return;
+    try {
+      const userBookings = await db.getBookings(user.uid, 'business');
+      setBookings(userBookings.filter(b => b.creatorId === id));
+    } catch (e) {
+      console.error('Failed to load bookings:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadUserBookings();
+  }, [id, user]);
 
   if (loading) {
     return (
@@ -103,8 +120,13 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
     }
   };
 
-  // Generate WhatsApp Direct link
-  const whatsappPhone = creator.socials.snapchat || creator.socials.pinterest || '+919876543210'; // Fallback
+  const isAdminUser = user?.role === 'admin';
+  const isSelf = user?.uid === creator?.uid;
+  const hasAcceptedBooking = bookings.some(b => b.status === 'accepted' || b.status === 'completed');
+  const hasPendingBooking = bookings.some(b => b.status === 'pending');
+  const showContacts = isAdminUser || isSelf || hasAcceptedBooking;
+
+  const whatsappPhone = creator.socials.whatsapp || creator.socials.snapchat || '';
   const whatsappUrl = `https://wa.me/${whatsappPhone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(creator.name)}%2C%20we%20saw%20your%20profile%20on%20CreatorConnect%20and%20would%20love%20to%20collaborate!`;
 
   return (
@@ -321,11 +343,13 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
               <h3 className="font-bold text-foreground text-sm border-b border-border/80 pb-2 flex items-center gap-1.5">
                 <MessageCircle className="h-4.5 w-4.5 text-primary" /> Contact Collaborator
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We support direct connections. Contact this creator directly using your preferred platform.
-              </p>
 
-              <div className="flex flex-col gap-2">
+              {showContacts ? (
+                <>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    We support direct connections. Contact this creator directly using your preferred platform.
+                  </p>
+                  <div className="flex flex-col gap-2">
                 {/* WhatsApp */}
                 <a
                   href={whatsappUrl}
@@ -399,6 +423,40 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
                   </a>
                 )}
               </div>
+                </>
+              ) : hasPendingBooking ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center bg-secondary/30 rounded-xl border border-border">
+                  <Clock className="h-8 w-8 text-amber-500 mb-2" />
+                  <h4 className="font-bold text-foreground text-sm mb-1">Request Pending</h4>
+                  <p className="text-xs text-muted-foreground max-w-[200px]">
+                    Your booking request has been sent. Contact information will be revealed once the creator accepts.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center bg-secondary/30 rounded-xl border border-border">
+                  <Lock className="h-8 w-8 text-muted-foreground mb-2" />
+                  <h4 className="font-bold text-foreground text-sm mb-1">Contacts Locked</h4>
+                  <p className="text-xs text-muted-foreground max-w-[200px] mb-4">
+                    Send a campaign booking request first. Once accepted, direct contacts will be revealed.
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (!user) {
+                        alert('Please sign in as a Business Owner to place a booking request.');
+                        return;
+                      }
+                      if (user.role !== 'business') {
+                        alert('Only Business Owner accounts can place campaign booking requests.');
+                        return;
+                      }
+                      setBookingOpen(true);
+                    }}
+                    className="w-full h-10 rounded-xl gradient-primary text-xs font-bold text-white hover:opacity-90 transition-opacity"
+                  >
+                    Send Booking Request
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Campaign Pricing Packages */}
@@ -453,7 +511,10 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
           creator={creator} 
           isOpen={bookingOpen} 
           onClose={() => setBookingOpen(false)}
-          onSuccess={() => setBookingOpen(false)}
+          onSuccess={() => {
+            setBookingOpen(false);
+            loadUserBookings();
+          }}
         />
       )}
     </div>
