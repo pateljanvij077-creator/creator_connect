@@ -74,7 +74,8 @@ service cloud.firestore {
     
     // 7. commissions
     match /commissions/{overrideId} {
-      allow read, write: if isAdmin();
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
     // 8. notifications

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CreatorConnect Web App</title>
+  <meta http-equiv="refresh" content="0;url=http://localhost:3000">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+    }
+    a {
+      color: #818cf8;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>⚡ Launching CreatorConnect Web App...</h2>
+    <p>If you are not redirected automatically, <a href="http://localhost:3000">click here to open CreatorConnect</a>.</p>
+  </div>
+  <script>
+    window.location.href = window.location.origin || "http://localhost:3000";
+  </script>
+</body>
+</html>

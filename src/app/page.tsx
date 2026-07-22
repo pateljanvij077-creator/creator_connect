@@ -21,7 +21,16 @@ import {
   ShieldCheck,
   Zap,
   Star,
-  DollarSign
+  DollarSign,
+  Smartphone,
+  Download,
+  CheckCircle,
+  Wallet,
+  MessageSquare,
+  Bell,
+  Share,
+  QrCode,
+  Shield
 } from 'lucide-react';
 import { formatFollowers } from '@/lib/utils';
 
@@ -32,6 +41,88 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [cityQuery, setCityQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  
+  // App Download State
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
+  const [downloadSuccessMsg, setDownloadSuccessMsg] = useState('');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  // Listen for Browser PWA Install Prompt
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  // Download Direct Web App Launcher & Trigger PWA Install
+  const handleDownloadWebApp = async () => {
+    // If PWA prompt is supported by browser, trigger native PWA app installation
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice.outcome === 'accepted') {
+        setDownloadSuccessMsg('CreatorConnect Web App Installed on your device!');
+        setTimeout(() => setDownloadSuccessMsg(''), 4000);
+        setDeferredPrompt(null);
+        return;
+      }
+    }
+
+    // Direct Web App Launcher File Download (.url)
+    setDownloadProgress(0);
+    const interval = setInterval(() => {
+      setDownloadProgress((prev) => {
+        if (prev === null || prev >= 100) {
+          clearInterval(interval);
+          
+          const link = document.createElement('a');
+          link.href = '/downloads/CreatorConnect-WebApp.url';
+          link.download = 'CreatorConnect-WebApp.url';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          setDownloadSuccessMsg('CreatorConnect-WebApp downloaded! Click the downloaded file to open CreatorConnect directly.');
+          setTimeout(() => {
+            setDownloadProgress(null);
+            setDownloadSuccessMsg('');
+          }, 5000);
+          return 100;
+        }
+        return prev + 34;
+      });
+    }, 200);
+  };
+
+  // Download Android APK File (Mobile Only)
+  const handleDownloadApk = () => {
+    setDownloadProgress(0);
+    const interval = setInterval(() => {
+      setDownloadProgress((prev) => {
+        if (prev === null || prev >= 100) {
+          clearInterval(interval);
+          
+          const link = document.createElement('a');
+          link.href = '/downloads/CreatorConnect-App.apk';
+          link.download = 'CreatorConnect-v1.2.0.apk';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          setDownloadSuccessMsg('CreatorConnect-v1.2.0.apk downloaded! Open on Android Mobile to install.');
+          setTimeout(() => {
+            setDownloadProgress(null);
+            setDownloadSuccessMsg('');
+          }, 5000);
+          return 100;
+        }
+        return prev + 25;
+      });
+    }, 250);
+  };
   
   // Creators and Stats state
   const [creators, setCreators] = useState<Creator[]>([]);
@@ -483,6 +574,148 @@ export default function Home() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5.5 MOBILE APP & WEB APP DOWNLOAD SECTION */}
+      <section className="py-20 bg-gradient-to-b from-background via-primary/5 to-background border-t border-border/60 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        </div>
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="glass-panel rounded-3xl border border-border p-8 lg:p-12 shadow-2xl relative overflow-hidden bg-card/80 backdrop-blur-xl">
+            
+            {/* Background Glow */}
+            <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              
+              {/* Left Column: Direct App Downloads */}
+              <div className="lg:col-span-7 flex flex-col gap-6">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary w-fit">
+                  <Smartphone className="h-4 w-4" /> Native Mobile & Web App Package (v1.2.0)
+                </span>
+
+                <h2 className="text-3xl sm:text-5xl font-extrabold text-foreground leading-tight tracking-tight">
+                  Download Official <br />
+                  <span className="gradient-text">CreatorConnect App</span>
+                </h2>
+
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  Download the official CreatorConnect application directly to your mobile device or desktop. Get real-time campaign push alerts, fast 1-tap wallet deposits, and instant direct creator messaging.
+                </p>
+
+                {/* Download Progress Bar Feedback */}
+                {downloadProgress !== null && (
+                  <div className="p-4 rounded-2xl bg-secondary/60 border border-border flex flex-col gap-2 animate-in fade-in">
+                    <div className="flex justify-between items-center text-xs font-bold">
+                      <span className="text-foreground flex items-center gap-2">
+                        <Download className="h-4 w-4 text-primary animate-bounce" /> Downloading App Package...
+                      </span>
+                      <span className="text-primary font-mono">{downloadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-border rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-primary h-2 rounded-full transition-all duration-300 gradient-primary"
+                        style={{ width: `${downloadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {downloadSuccessMsg && (
+                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-emerald-500 flex items-center gap-2 animate-in zoom-in-95">
+                    <CheckCircle className="h-4 w-4 flex-shrink-0" /> {downloadSuccessMsg}
+                  </div>
+                )}
+
+                {/* Real App Download Action Buttons */}
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
+                  
+                  {/* Direct Web App Launcher Download Button */}
+                  <button
+                    type="button"
+                    onClick={handleDownloadWebApp}
+                    className="rounded-2xl gradient-primary px-6 py-4 text-xs font-bold text-white shadow-xl shadow-primary/25 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 group"
+                  >
+                    <Download className="h-5 w-5 group-hover:animate-bounce" />
+                    <div className="text-left">
+                      <span className="text-[9px] uppercase tracking-wider block opacity-80">Instant Direct Web App</span>
+                      <span className="text-sm font-bold block">Download Direct Web App (.url / PWA)</span>
+                    </div>
+                  </button>
+
+                  {/* Android Mobile Phone APK Button */}
+                  <button
+                    type="button"
+                    onClick={handleDownloadApk}
+                    className="rounded-2xl border border-border bg-card hover:bg-secondary/60 px-6 py-4 text-xs font-bold text-foreground transition-all flex items-center justify-center gap-3 shadow-sm hover:scale-105 active:scale-95"
+                  >
+                    <span className="text-xl">🤖</span>
+                    <div className="text-left">
+                      <span className="text-[9px] uppercase tracking-wider block text-muted-foreground">Android Mobile Only</span>
+                      <span className="text-sm font-bold text-foreground block">Download Android APK</span>
+                    </div>
+                  </button>
+
+                </div>
+
+                {/* System Specs Tag */}
+                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground font-medium pt-2">
+                  <span>✅ Android 8.0+ & iOS 14+</span>
+                  <span>•</span>
+                  <span>🔒 100% Virus & Malware Scanned</span>
+                  <span>•</span>
+                  <span>⚡ Fast Installation</span>
+                </div>
+
+              </div>
+
+              {/* Right Column: App Feature & System Overview Cards */}
+              <div className="lg:col-span-5 flex flex-col gap-4">
+                
+                <div className="p-5 rounded-2xl bg-background/90 border border-border shadow-md flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary flex-shrink-0">
+                    <Bell className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground text-sm mb-1">Instant Push Notifications</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Get real-time mobile push alerts whenever a creator accepts your booking request or submits campaign drafts.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-background/90 border border-border shadow-md flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 flex-shrink-0">
+                    <Wallet className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground text-sm mb-1">Security Wallet Protection</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Mobile wallet hold policy guarantees money safety for businesses and payment delivery for creators.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-background/90 border border-border shadow-md flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-500 flex-shrink-0">
+                    <ShieldCheck className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground text-sm mb-1">Verified Direct Pitching</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Connect in 1-tap with verified creators directly on WhatsApp or Instagram DM without slow messaging delays.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
         </div>
       </section>

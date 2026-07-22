@@ -109,6 +109,16 @@ export interface Review {
   createdAt: string;
 }
 
+export interface WalletTransaction {
+  id: string;
+  userId: string;
+  type: 'deposit' | 'refund' | 'deduction' | 'hold' | 'payout';
+  amount: number;
+  description: string;
+  status: 'completed' | 'pending' | 'failed';
+  createdAt: string;
+}
+
 export interface AdminSettings {
   platformName: string;
   platformLogo: string;
@@ -123,6 +133,16 @@ export interface AdminSettings {
   refundPolicy: string;
   seoTitle: string;
   seoDescription: string;
+  // Wallet & Payment Policy Settings
+  minWalletDeposit: number;
+  unconfirmedDeductionFee: number;
+  baseBookingPlatformFee: number;
+  razorpayKeyId: string;
+  razorpaySecret: string;
+  stripePublicKey: string;
+  stripeSecretKey: string;
+  paymentMode: 'test' | 'live';
+  bookingPolicyTerms: string;
 }
 
 export interface CommissionOverride {
@@ -164,7 +184,16 @@ export const DEFAULT_ADMIN_SETTINGS: AdminSettings = {
   termsOfService: 'Platform terms require professional collaboration...',
   refundPolicy: 'Refunds are issued if campaigns are cancelled 48h prior...',
   seoTitle: 'CreatorConnect - Connect Businesses and Local Creators',
-  seoDescription: 'The ultimate marketplace connecting local retail, dining, and lifestyle businesses with top creators for social campaigns.'
+  seoDescription: 'The ultimate marketplace connecting local retail, dining, and lifestyle businesses with top creators for social campaigns.',
+  minWalletDeposit: 1000,
+  unconfirmedDeductionFee: 100,
+  baseBookingPlatformFee: 500,
+  razorpayKeyId: 'rzp_test_9876543210',
+  razorpaySecret: 'rzp_sec_test_secret_key',
+  stripePublicKey: 'pk_test_51Nx9876543210',
+  stripeSecretKey: 'sk_test_51Nx9876543210',
+  paymentMode: 'test',
+  bookingPolicyTerms: '1. A minimum ₹1,000 wallet deposit is mandatory to send a booking request.\n2. If the booking deal is confirmed & completed on CreatorConnect, the security deposit is refunded back to your wallet.\n3. If the booking deal is not confirmed, cancelled, or off-platform contact is attempted, a ₹100 deduction fee is applied.\n4. Direct money withdrawal is temporarily locked per platform policy (Withdrawal Feature Coming Soon).'
 };
 
 export const SEED_CREATORS: Creator[] = [];

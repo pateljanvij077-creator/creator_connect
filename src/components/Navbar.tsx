@@ -18,9 +18,12 @@ import {
   Link as LinkIcon, 
   Settings, 
   ShieldAlert,
-  Users
+  Users,
+  Wallet
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
+import { db } from '@/lib/db';
+import WalletModal from './WalletModal';
 
 export default function Navbar() {
   const { user, profile, logout, isBusiness, isCreator, isAdmin } = useAuth();
@@ -28,6 +31,24 @@ export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [currency, setCurrency] = useState('₹');
+
+  React.useEffect(() => {
+    if (!user) return;
+    const fetchWallet = async () => {
+      try {
+        const settings = await db.getAdminSettings();
+        setCurrency(settings.currency);
+        const bal = await db.getWalletBalance(user.uid);
+        setWalletBalance(bal);
+      } catch (err) {
+        console.error('Error fetching navbar wallet balance:', err);
+      }
+    };
+    fetchWallet();
+  }, [user]);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -113,6 +134,20 @@ export default function Navbar() {
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
+
+            {/* Wallet Button */}
+            {user && (
+              <button
+                onClick={() => setIsWalletOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-secondary/50 text-xs font-bold text-foreground transition-all shadow-sm group"
+                title="Manage CreatorConnect Wallet & Security Fund"
+              >
+                <div className="p-1 rounded-full gradient-primary text-white group-hover:scale-105 transition-transform">
+                  <Wallet className="h-3.5 w-3.5" />
+                </div>
+                <span>Wallet: {formatCurrency(walletBalance, currency)}</span>
+              </button>
+            )}
 
             {/* Auth Dropdown */}
             {user ? (
@@ -297,6 +332,13 @@ export default function Navbar() {
           )}
         </div>
       )}
+
+      {/* Wallet Modal */}
+      <WalletModal
+        isOpen={isWalletOpen}
+        onClose={() => setIsWalletOpen(false)}
+        onBalanceUpdated={(newBal) => setWalletBalance(newBal)}
+      />
     </nav>
   );
 }

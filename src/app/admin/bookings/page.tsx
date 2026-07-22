@@ -14,7 +14,10 @@ import {
   Check, 
   X,
   HelpCircle,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 

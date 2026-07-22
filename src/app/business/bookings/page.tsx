@@ -18,7 +18,10 @@ import {
   Globe, 
   HelpCircle,
   FileText,
-  Star
+  Star,
+  Lock,
+  Unlock,
+  CreditCard
 } from 'lucide-react';
 import { InstagramIcon } from '@/components/SocialIcons';
 import { formatCurrency } from '@/lib/utils';

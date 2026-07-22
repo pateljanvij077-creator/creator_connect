@@ -22,7 +22,8 @@ import {
   ArrowLeft,
   Camera,
   Lock,
-  Clock
+  Clock,
+  CreditCard
 } from 'lucide-react';
 import { 
   InstagramIcon, 
@@ -47,6 +48,7 @@ export default function CreatorProfile({ params }: CreatorProfileProps) {
   const [loading, setLoading] = useState(true);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [payingContact, setPayingContact] = useState(false);
 
   // Load creator and reviews
   useEffect(() => {

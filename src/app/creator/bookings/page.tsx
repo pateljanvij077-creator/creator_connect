@@ -74,13 +74,39 @@ export default function CreatorBookings() {
 
       await db.updateBooking(bookingId, updateData);
 
+      // Handle Wallet Transactions
+      try {
+        const settings = await db.getAdminSettings();
+        const unconfirmedFee = settings.unconfirmedDeductionFee || 100;
+        
+        if (action === 'rejected') {
+          // Deduct unconfirmed fee from business wallet
+          await db.addWalletTransaction(
+            booking.businessId,
+            'deduction',
+            unconfirmedFee,
+            `Unconfirmed / Rejected Booking Fee for "${booking.campaignTitle}"`
+          );
+        } else if (action === 'completed' && (user?.uid || booking.creatorId)) {
+          // Add earnings to creator wallet
+          await db.addWalletTransaction(
+            user?.uid || booking.creatorId,
+            'payout',
+            booking.creatorEarnings,
+            `Campaign Payout Earnings for "${booking.campaignTitle}"`
+          );
+        }
+      } catch (walletErr) {
+        console.error('Wallet transaction logging failed:', walletErr);
+      }
+
       // Create Notification for the Business Owner
       const notificationTitle = action === 'accepted' ? 'Campaign Accepted!' : action === 'rejected' ? 'Campaign Declined' : 'Campaign Completed!';
       const notificationMsg = action === 'accepted'
         ? `${profile?.name || 'A creator'} has accepted your campaign "${booking.campaignTitle}". Check direct links to connect on WhatsApp / Instagram.`
         : action === 'rejected'
-        ? `${profile?.name || 'A creator'} has declined your campaign "${booking.campaignTitle}". Payout will be refunded.`
-        : `${profile?.name || 'A creator'} has marked the campaign "${booking.campaignTitle}" as completed. Please confirm to close the campaign.`;
+        ? `${profile?.name || 'A creator'} has declined your campaign "${booking.campaignTitle}". ₹100 unconfirmed fee applied.`
+        : `${profile?.name || 'A creator'} has marked the campaign "${booking.campaignTitle}" as completed. Payout credited to creator wallet.`;
 
       await db.createNotification(booking.businessId, notificationTitle, notificationMsg, `booking_${action}`);
 

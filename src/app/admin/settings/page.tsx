@@ -13,7 +13,12 @@ import {
   Mail, 
   Phone,
   FileText,
-  Search
+  Search,
+  Wallet,
+  CreditCard,
+  Key,
+  Lock,
+  Scale
 } from 'lucide-react';
 
 export default function AdminSettingsPage() {
@@ -30,6 +35,17 @@ export default function AdminSettingsPage() {
   const [refundPolicy, setRefundPolicy] = useState('');
   const [seoTitle, setSeoTitle] = useState('');
   const [seoDescription, setSeoDescription] = useState('');
+
+  // Payment & Wallet Settings State
+  const [minWalletDeposit, setMinWalletDeposit] = useState<number>(1000);
+  const [unconfirmedDeductionFee, setUnconfirmedDeductionFee] = useState<number>(100);
+  const [baseBookingPlatformFee, setBaseBookingPlatformFee] = useState<number>(500);
+  const [razorpayKeyId, setRazorpayKeyId] = useState('');
+  const [razorpaySecret, setRazorpaySecret] = useState('');
+  const [stripePublicKey, setStripePublicKey] = useState('');
+  const [stripeSecretKey, setStripeSecretKey] = useState('');
+  const [paymentMode, setPaymentMode] = useState<'test' | 'live'>('test');
+  const [bookingPolicyTerms, setBookingPolicyTerms] = useState('');
 
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -53,6 +69,17 @@ export default function AdminSettingsPage() {
         setRefundPolicy(data.refundPolicy || '');
         setSeoTitle(data.seoTitle || '');
         setSeoDescription(data.seoDescription || '');
+
+        // Wallet & Payment settings
+        setMinWalletDeposit(data.minWalletDeposit !== undefined ? data.minWalletDeposit : 1000);
+        setUnconfirmedDeductionFee(data.unconfirmedDeductionFee !== undefined ? data.unconfirmedDeductionFee : 100);
+        setBaseBookingPlatformFee(data.baseBookingPlatformFee !== undefined ? data.baseBookingPlatformFee : 500);
+        setRazorpayKeyId(data.razorpayKeyId || 'rzp_test_9876543210');
+        setRazorpaySecret(data.razorpaySecret || 'rzp_sec_test_secret_key');
+        setStripePublicKey(data.stripePublicKey || 'pk_test_51Nx9876543210');
+        setStripeSecretKey(data.stripeSecretKey || 'sk_test_51Nx9876543210');
+        setPaymentMode(data.paymentMode || 'test');
+        setBookingPolicyTerms(data.bookingPolicyTerms || '');
       } catch (e) {
         console.error('Error loading administrative settings:', e);
       } finally {
@@ -80,7 +107,16 @@ export default function AdminSettingsPage() {
         termsOfService,
         refundPolicy,
         seoTitle,
-        seoDescription
+        seoDescription,
+        minWalletDeposit: Number(minWalletDeposit),
+        unconfirmedDeductionFee: Number(unconfirmedDeductionFee),
+        baseBookingPlatformFee: Number(baseBookingPlatformFee),
+        razorpayKeyId,
+        razorpaySecret,
+        stripePublicKey,
+        stripeSecretKey,
+        paymentMode,
+        bookingPolicyTerms
       };
 
       await db.updateAdminSettings(updated);
@@ -208,6 +244,151 @@ export default function AdminSettingsPage() {
               onChange={(e) => setMaintenanceMode(e.target.checked)}
               className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20 accent-primary"
             />
+          </div>
+        </div>
+
+        {/* Wallet Deposit & Policy Rules Configuration */}
+        <div className="glass-panel rounded-2xl border border-border p-6 shadow-sm flex flex-col gap-4">
+          <h3 className="text-sm font-bold text-foreground border-b border-border/80 pb-2 flex items-center gap-2">
+            <Wallet className="h-4 w-4 text-primary" /> Wallet & Booking Policy Controls
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Minimum Wallet Deposit ({currency})
+              </label>
+              <input
+                type="number"
+                required
+                min={0}
+                value={minWalletDeposit}
+                onChange={(e) => setMinWalletDeposit(Number(e.target.value))}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <span className="text-[10px] text-muted-foreground mt-1 block">Customer must have this balance before booking</span>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Unconfirmed Deduction Fee ({currency})
+              </label>
+              <input
+                type="number"
+                required
+                min={0}
+                value={unconfirmedDeductionFee}
+                onChange={(e) => setUnconfirmedDeductionFee(Number(e.target.value))}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <span className="text-[10px] text-muted-foreground mt-1 block">Fee deducted if booking deal fails or gets cancelled</span>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Base Booking Service Charge ({currency})
+              </label>
+              <input
+                type="number"
+                required
+                min={0}
+                value={baseBookingPlatformFee}
+                onChange={(e) => setBaseBookingPlatformFee(Number(e.target.value))}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <span className="text-[10px] text-muted-foreground mt-1 block">Per-booking platform fee baseline</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+              Customer Booking & Wallet Policy Agreement Terms
+            </label>
+            <textarea
+              rows={4}
+              value={bookingPolicyTerms}
+              onChange={(e) => setBookingPolicyTerms(e.target.value)}
+              className="w-full rounded-xl border border-border bg-background px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+
+        {/* Payment Gateway API Credentials */}
+        <div className="glass-panel rounded-2xl border border-border p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex items-center justify-between border-b border-border/80 pb-2">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-primary" /> Payment Gateway API Credentials
+            </h3>
+            <div className="flex items-center gap-2 bg-secondary/50 p-1 rounded-xl border border-border">
+              <button
+                type="button"
+                onClick={() => setPaymentMode('test')}
+                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                  paymentMode === 'test' ? 'bg-amber-500 text-white shadow-sm' : 'text-muted-foreground'
+                }`}
+              >
+                Test Gateway Mode
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMode('live')}
+                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                  paymentMode === 'live' ? 'bg-emerald-500 text-white shadow-sm' : 'text-muted-foreground'
+                }`}
+              >
+                Live Mode
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Razorpay Key ID
+              </label>
+              <input
+                type="text"
+                value={razorpayKeyId}
+                onChange={(e) => setRazorpayKeyId(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Razorpay Secret Key
+              </label>
+              <input
+                type="password"
+                value={razorpaySecret}
+                onChange={(e) => setRazorpaySecret(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Stripe Publishable Key
+              </label>
+              <input
+                type="text"
+                value={stripePublicKey}
+                onChange={(e) => setStripePublicKey(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                Stripe Secret Key
+              </label>
+              <input
+                type="password"
+                value={stripeSecretKey}
+                onChange={(e) => setStripeSecretKey(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
           </div>
         </div>
 

@@ -19,12 +19,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CreatorConnect - Retail & Local Creator Marketplace",
   description: "Connect local retail, dining, and lifestyle businesses with top creators for social campaigns.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "CreatorConnect"
+  }
 };
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  themeColor: '#6366f1'
 };
 
 export default function RootLayout({

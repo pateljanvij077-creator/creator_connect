@@ -19,6 +19,7 @@ import {
   Review, 
   AdminSettings, 
   CommissionOverride,
+  WalletTransaction,
   DEFAULT_ADMIN_SETTINGS,
   SEED_CREATORS,
   SEED_BUSINESSES,
@@ -532,5 +533,103 @@ export const db = {
         setLocalStorageData('cc_notifications', list);
       }
     }
+  },
+
+  // WALLET & TRANSACTIONS
+  async getWalletBalance(userId: string): Promise<number> {
+    if (firestoreDb) {
+      try {
+        const docRef = doc(firestoreDb, 'wallets', userId);
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() ? (docSnap.data().balance || 0) : 0;
+      } catch (e) {
+        console.warn('Firestore getWalletBalance error, using LocalStorage fallback:', e);
+      }
+    }
+    const wallets = getLocalStorageData('cc_wallets', {});
+    if (wallets[userId] === undefined) {
+      wallets[userId] = 0; // Default wallet balance
+      setLocalStorageData('cc_wallets', wallets);
+    }
+    return wallets[userId];
+  },
+
+  async getWalletTransactions(userId: string): Promise<WalletTransaction[]> {
+    if (firestoreDb) {
+      try {
+        const q = query(collection(firestoreDb, 'wallet_transactions'), where('userId', '==', userId));
+        const querySnapshot = await getDocs(q);
+        const list: WalletTransaction[] = [];
+        querySnapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() } as WalletTransaction);
+        });
+        return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      } catch (e) {
+        console.warn('Firestore getWalletTransactions error, using LocalStorage fallback:', e);
+      }
+    }
+    const list = getLocalStorageData('cc_wallet_transactions', []);
+    return list
+      .filter((t: WalletTransaction) => t.userId === userId)
+      .sort((a: WalletTransaction, b: WalletTransaction) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+
+  async addWalletTransaction(
+    userId: string,
+    type: 'deposit' | 'refund' | 'deduction' | 'hold' | 'payout',
+    amount: number,
+    description: string
+  ): Promise<number> {
+    const id = 'tx_' + Math.random().toString(36).substr(2, 9);
+    const tx: WalletTransaction = {
+      id,
+      userId,
+      type,
+      amount,
+      description,
+      status: 'completed',
+      createdAt: new Date().toISOString()
+    };
+
+    let newBalance = 0;
+
+    if (firestoreDb) {
+      try {
+        await setDoc(doc(firestoreDb, 'wallet_transactions', id), tx);
+        const docRef = doc(firestoreDb, 'wallets', userId);
+        const docSnap = await getDoc(docRef);
+        const current = docSnap.exists() ? (docSnap.data().balance || 0) : 0;
+        
+        if (type === 'deposit' || type === 'refund' || type === 'payout') {
+          newBalance = current + amount;
+        } else {
+          newBalance = Math.max(0, current - amount);
+        }
+        
+        await setDoc(docRef, { balance: newBalance }, { merge: true });
+        return newBalance;
+      } catch (e) {
+        console.warn('Firestore addWalletTransaction error, using LocalStorage fallback:', e);
+      }
+    }
+
+    // LocalStorage Fallback (100% Reliable in Test Mode)
+    const list = getLocalStorageData('cc_wallet_transactions', []);
+    list.push(tx);
+    setLocalStorageData('cc_wallet_transactions', list);
+
+    const wallets = getLocalStorageData('cc_wallets', {});
+    const current = wallets[userId] !== undefined ? wallets[userId] : 0;
+    
+    if (type === 'deposit' || type === 'refund' || type === 'payout') {
+      newBalance = current + amount;
+    } else {
+      newBalance = Math.max(0, current - amount);
+    }
+    
+    wallets[userId] = newBalance;
+    setLocalStorageData('cc_wallets', wallets);
+
+    return newBalance;
   }
 };
