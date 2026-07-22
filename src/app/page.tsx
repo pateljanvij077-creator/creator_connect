@@ -32,10 +32,11 @@ import {
   QrCode,
   Shield
 } from 'lucide-react';
-import { formatFollowers } from '@/lib/utils';
+import { useAuth } from '@/lib/auth';
 
 export default function Home() {
   const router = useRouter();
+  const { user, isBusiness, isCreator, isAdmin, loading: authLoading } = useAuth();
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,6 +47,21 @@ export default function Home() {
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
   const [downloadSuccessMsg, setDownloadSuccessMsg] = useState('');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  // REDIRECT LOGGED-IN USERS TO DASHBOARD (NOT ALLOWED TO SEE LANDING PAGE WHEN LOGGED IN)
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (isBusiness) {
+        router.replace('/business/dashboard');
+      } else if (isCreator) {
+        router.replace('/creator/dashboard');
+      } else if (isAdmin) {
+        router.replace('/admin/dashboard');
+      } else {
+        router.replace('/creators');
+      }
+    }
+  }, [user, authLoading, isBusiness, isCreator, isAdmin, router]);
 
   // Listen for Browser PWA Install Prompt
   useEffect(() => {
@@ -193,8 +209,22 @@ export default function Home() {
     }
   ];
 
+  if (user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
+        <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-card border border-border shadow-2xl max-w-sm w-full animate-in zoom-in-95">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <div>
+            <h3 className="text-base font-extrabold text-foreground">Redirecting to Dashboard...</h3>
+            <p className="text-xs text-muted-foreground mt-1">Logged in users are redirected to their account dashboard.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col min-h-screen gradient-bg">
+    <div className="flex flex-col min-h-screen gradient-bg w-full max-w-full overflow-x-hidden">
       {/* 1. HERO SECTION */}
       <section className="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-24">
         <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
